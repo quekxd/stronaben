@@ -5,34 +5,196 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ben</title>
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
+            padding: 20px 0;
         }
-        .container {
-            text-align: center;
-            background-color: white;
+
+        /* KONTENER SLIDERA - Zwiększono max-width z 800px na 1200px */
+        .slider-container {
+            position: relative;
+            max-width: 1200px; 
+            width: 95%;
+            margin: auto;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            background-color: #000;
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+        }
+
+        /* ZDJĘCIE - Zwiększono wysokość z 450px na 650px */
+        .slide img {
+            width: 100%;
+            height: 650px; 
+            object-fit: contain;
+            display: block;
+        }
+
+        .fade {
+            animation-name: fade;
+            animation-duration: 0.5s;
+        }
+
+        @keyframes fade {
+            from { opacity: 0.4; }
+            to { opacity: 1; }
+        }
+
+        /* Przyciski strzałek - powiększone dla lepszej wygody */
+        .prev, .next {
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            color: white;
+            font-weight: bold;
+            font-size: 28px;
+            transition: 0.3s ease;
+            user-select: none;
+            background-color: rgba(0, 0, 0, 0.4);
+            border: none;
+            border-radius: 0 5px 5px 0;
         }
-        img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 5px;
+
+        .next {
+            right: 0;
+            border-radius: 5px 0 0 5px;
+        }
+
+        .prev:hover, .next:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .dots-container {
+            text-align: center;
+            position: absolute;
+            bottom: 15px;
+            width: 100%;
+        }
+
+        .dot {
+            cursor: pointer;
+            height: 14px;
+            width: 14px;
+            margin: 0 5px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            display: inline-block;
+            transition: background-color 0.3s ease;
+        }
+
+        .active, .dot:hover {
+            background-color: white;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <img src="ben.png" alt="Obrazek Ben">
+    <div class="slider-container">
+        <!-- Tutaj wpisujesz wszystkie swoje zdjęcia z folderu "zdjecia" -->
+        <div class="slide fade"><img src="zdjecia/1.jpg" alt="Zdjęcie 1"></div>
+        <div class="slide fade"><img src="zdjecia/2.jpg" alt="Zdjęcie 2"></div>
+        <div class="slide fade"><img src="zdjecia/3.jpg" alt="Zdjęcie 3"></div>
+        <div class="slide fade"><img src="zdjecia/4.jpg" alt="Zdjęcie 4"></div>
+        <div class="slide fade"><img src="zdjecia/5.jpg" alt="Zdjęcie 5"></div>
+        <div class="slide fade"><img src="zdjecia/6.jpg" alt="Zdjęcie 6"></div>
+        <div class="slide fade"><img src="zdjecia/7.jpg" alt="Zdjęcie 7"></div>
+        <div class="slide fade"><img src="zdjecia/8.jpg" alt="Zdjęcie 8"></div>
+        <div class="slide fade"><img src="zdjecia/9.jpg" alt="Zdjęcie 9"></div>
+        <div class="slide fade"><img src="zdjecia/10.jpg" alt="Zdjęcie 10"></div>
+        <div class="slide fade"><img src="zdjecia/11.jpg" alt="Zdjęcie 11"></div>
+        <div class="slide fade"><img src="zdjecia/12.jpg" alt="Zdjęcie 12"></div>
+
+        <!-- Przyciski nawigacji -->
+        <button class="prev" onclick="changeSlide(-1)">&#10094;</button>
+        <button class="next" onclick="changeSlide(1)">&#10095;</button>
+
+        <!-- Kropki wygenerują się automatycznie przez JavaScript -->
+        <div class="dots-container" id="dotsContainer"></div>
     </div>
+
+    <script>
+        let slideIndex = 1;
+        let autoSlideTimer;
+
+        // Automatyczne generowanie kropek w zależności od liczby zdjęć
+        function generateDots() {
+            const slides = document.getElementsByClassName("slide");
+            const dotsContainer = document.getElementById("dotsContainer");
+            dotsContainer.innerHTML = "";
+
+            for (let i = 0; i < slides.length; i++) {
+                const dot = document.createElement("span");
+                dot.className = "dot";
+                dot.onclick = () => currentSlide(i + 1);
+                dotsContainer.appendChild(dot);
+            }
+        }
+
+        generateDots();
+        showSlides(slideIndex);
+        startAutoSlide();
+
+        function changeSlide(n) {
+            showSlides(slideIndex += n);
+            resetAutoSlide();
+        }
+
+        function currentSlide(n) {
+            showSlides(slideIndex = n);
+            resetAutoSlide();
+        }
+
+        function showSlides(n) {
+            let slides = document.getElementsByClassName("slide");
+            let dots = document.getElementsByClassName("dot");
+
+            if (n > slides.length) { slideIndex = 1; }
+            if (n < 1) { slideIndex = slides.length; }
+
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";
+            }
+
+            for (let i = 0; i < dots.length; i++) {
+                dots[i].className = dots[i].className.replace(" active", "");
+            }
+
+            slides[slideIndex - 1].style.display = "block";
+            if (dots.length > 0) {
+                dots[slideIndex - 1].className += " active";
+            }
+        }
+
+        function startAutoSlide() {
+            autoSlideTimer = setInterval(() => {
+                slideIndex++;
+                showSlides(slideIndex);
+            }, 5000);
+        }
+
+        function resetAutoSlide() {
+            clearInterval(autoSlideTimer);
+            startAutoSlide();
+        }
+    </script>
 
 </body>
 </html>
