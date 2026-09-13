@@ -113,8 +113,17 @@ function handlePointerDown(e) {
     const interactive = e.target.closest('button, .prev, .next, .top-controls, .thumbnail, .quote-refresh-btn, .treat-tag, input, a');
     if (interactive) return;
 
-    // Tylko lewy przycisk myszy
+    // Tylko lewy przycisk myszy dla pointerType 'mouse'
     if (e.button !== 0 && e.pointerType === 'mouse') return;
+
+    // NA URZĄDZENIACH DOTYKOWYCH (telefony, tablety):
+    // Przeciąganie rozpoczyna się WYŁĄCZNIE po dotknięciu ikony uchwytu .drag-handle!
+    // Dotknięcie i przesunięcie palcem w dowolnym innym miejscu służy do naturalnego, płynnego przewijania strony (scroll).
+    const isTouch = e.pointerType === 'touch';
+    const isHandle = e.target.closest('.drag-handle');
+    if (isTouch && !isHandle) {
+        return;
+    }
 
     const panel = e.currentTarget;
     const slot = panel.closest('.panel-slot');
@@ -126,12 +135,13 @@ function handlePointerDown(e) {
         startX: e.clientX,
         startY: e.clientY,
         isDragging: false,
+        isTouch,
         ghost: null,
         offsetX: 0,
         offsetY: 0
     };
 
-    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointermove', handlePointerMove, { passive: false });
     window.addEventListener('pointerup', handlePointerUp);
     window.addEventListener('pointercancel', handlePointerCancel);
 }
@@ -139,20 +149,26 @@ function handlePointerDown(e) {
 function handlePointerMove(e) {
     if (!dragState) return;
 
-    // Sprawdź próg przesunięcia (5px), by odróżnić zwykły klik od przeciągania
+    // Sprawdź próg przesunięcia (5px dla myszy, 6px dla dotyku)
     if (!dragState.isDragging) {
+        const threshold = dragState.isTouch ? 6 : 5;
         const dist = Math.hypot(e.clientX - dragState.startX, e.clientY - dragState.startY);
-        if (dist > 5) {
+        if (dist > threshold) {
             startDragging(e);
         } else {
             return;
         }
     }
 
-    // Aktualizuj pozycję ghosta
+    // Blokujemy domyślny scroll tylko podczas aktywnego przeciągania uchwytem
+    if (e.cancelable) {
+        e.preventDefault();
+    }
+
+    // Aktualizuj pozycję ghosta (z lekkim uniesieniem nad palec na telefonach)
     if (dragState.ghost) {
         const left = e.clientX - dragState.offsetX;
-        const top = e.clientY - dragState.offsetY;
+        const top = e.clientY - dragState.offsetY - (dragState.isTouch ? 25 : 0);
         dragState.ghost.style.setProperty('left', `${left}px`, 'important');
         dragState.ghost.style.setProperty('top', `${top}px`, 'important');
     }
@@ -168,6 +184,11 @@ function startDragging(e) {
 
     dragState.offsetX = e.clientX - rect.left;
     dragState.offsetY = e.clientY - rect.top;
+
+    // Delikatna wibracja haptyczna na telefonach przy podniesieniu karty
+    if (dragState.isTouch && navigator.vibrate) {
+        try { navigator.vibrate(25); } catch (_) {}
+    }
 
     // Stwórz element-widmo (ghost)
     const ghost = panel.cloneNode(true);
@@ -368,6 +389,7 @@ const slideDuration = 5000;
 generateThumbnails();
 showSlides(slideIndex);
 startAutoSlide();
+initSliderTouchSwipe();
 
 function generateThumbnails() {
     const slides = document.querySelectorAll(".slide img");
@@ -497,6 +519,41 @@ document.addEventListener('fullscreenchange', () => {
 document.addEventListener('webkitfullscreenchange', () => {
     setTimeout(updateSliderLayout, 50);
 });
+
+// Obsługa gestów przesuwania (swipe) na telefonach
+function initSliderTouchSwipe() {
+    const wrapper = document.querySelector(".slides-wrapper");
+    if (!wrapper) return;
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let isTracking = false;
+
+    wrapper.addEventListener('touchstart', (e) => {
+        if (e.target.closest('button, .top-controls')) return;
+        if (e.touches.length === 1) {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            isTracking = true;
+        }
+    }, { passive: true });
+
+    wrapper.addEventListener('touchend', (e) => {
+        if (!isTracking || e.changedTouches.length !== 1) return;
+        isTracking = false;
+        const deltaX = e.changedTouches[0].clientX - touchStartX;
+        const deltaY = e.changedTouches[0].clientY - touchStartY;
+
+        // Jeśli gest jest wyraźnie poziomy (> 35px i większy niż pionowy)
+        if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 35) {
+            if (deltaX < 0) {
+                changeSlide(1); // Swipe w lewo -> następne zdjęcie
+            } else {
+                changeSlide(-1); // Swipe w prawo -> poprzednie zdjęcie
+            }
+        }
+    }, { passive: true });
+}
 
 
 // ========================================================
