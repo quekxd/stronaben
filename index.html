@@ -18,7 +18,6 @@
         
         body {
             font-family: 'Poppins', sans-serif;
-            /* Nowoczesne, ciemne tło z delikatnym gradientem */
             background: linear-gradient(135deg, #18181f 0%, #0a0a0c 100%);
             color: #ffffff;
             height: 100vh;
@@ -29,18 +28,17 @@
             padding: 20px;
         }
 
-        /* GŁÓWNY UKŁAD STRONY (LEWA = SLIDER, PRAWA = WIDŻETY) */
         .app-layout {
             display: grid;
-            grid-template-columns: 1fr 380px; /* Slider zajmuje resztę, panel 380px */
+            grid-template-columns: 1fr 380px;
             gap: 25px;
             width: 100%;
             max-width: 1600px;
             height: 100%;
-            max-height: 900px; /* Zapobiega zbytniej wielkości na ogromnych ekranach */
+            max-height: 900px;
         }
 
-        /* --- 1. SLIDER --- */
+        /* --- SLIDER --- */
         .slider-container {
             position: relative;
             background-color: #000;
@@ -54,7 +52,7 @@
         }
 
         .slides-wrapper {
-            flex: 1; /* Dynamiczna wysokość, dopasowuje się do ekranu */
+            flex: 1;
             position: relative;
             background-color: #000;
             overflow: hidden;
@@ -63,7 +61,7 @@
         .slides-track {
             display: flex;
             width: 100%;
-            height: 100%; /* Ważne! */
+            height: 100%;
             transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
         }
         
@@ -76,11 +74,10 @@
         .slide img {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* Zdjęcie się dopasuje, ale nie utnie */
+            object-fit: contain;
             display: block;
         }
 
-        /* STRZAŁKI NAWIGACJI */
         .prev, .next {
             cursor: pointer;
             position: absolute;
@@ -96,16 +93,9 @@
             border-radius: 0 12px 12px 0;
             z-index: 10;
         }
-        .next {
-            right: 0;
-            border-radius: 12px 0 0 12px;
-        }
-        .prev:hover, .next:hover {
-            background-color: rgba(241, 196, 15, 0.8);
-            color: #000;
-        }
+        .next { right: 0; border-radius: 12px 0 0 12px; }
+        .prev:hover, .next:hover { background-color: rgba(241, 196, 15, 0.8); color: #000; }
 
-        /* PASEK POSTĘPU */
         .progress-container {
             position: absolute;
             bottom: 0;
@@ -122,7 +112,6 @@
             box-shadow: 0 0 10px #f1c40f;
         }
 
-        /* GÓRNE PRZYCISKI */
         .top-controls {
             position: absolute;
             top: 20px;
@@ -152,9 +141,8 @@
             color: #000;
         }
 
-        /* MINIATURKI */
         .thumbnails-container {
-            height: 85px; /* Stała wysokość na dole slidera */
+            height: 85px;
             flex-shrink: 0;
             display: flex;
             align-items: center;
@@ -164,7 +152,6 @@
             overflow-x: auto;
             border-top: 1px solid rgba(255,255,255,0.05);
         }
-        /* Ukrywanie paska scrolla w miniaturkach (tylko ładne przesunięcie) */
         .thumbnails-container::-webkit-scrollbar { display: none; }
         
         .thumbnail {
@@ -184,21 +171,20 @@
             box-shadow: 0 4px 10px rgba(241, 196, 15, 0.3);
         }
 
-        /* --- 2. BOCZNY PANEL (PRAWY) --- */
+        /* --- BOCZNY PANEL --- */
         .sidebar {
             display: flex;
             flex-direction: column;
-            gap: 25px;
+            gap: 20px;
             height: 100%;
         }
 
-        /* Wspólny styl dla bloków w panelu (Glassmorphism) */
         .widget-box {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.06);
             backdrop-filter: blur(20px);
             border-radius: 24px;
-            padding: 30px 20px;
+            padding: 25px 20px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
             text-align: center;
             display: flex;
@@ -207,61 +193,46 @@
         }
 
         /* LICZNIK WIEKU */
-        .age-widget {
-            flex: 1.5; /* Zajmuje więcej miejsca */
-        }
-        .age-widget h2 {
-            margin-bottom: 25px;
-            font-size: 24px;
-            font-weight: 600;
-            color: #ffffff;
-            letter-spacing: 0.5px;
-        }
-        .age-widget h2 span {
-            color: #f1c40f;
-        }
-        
-        .age-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr); /* 2 kolumny dla idealnego ułożenia */
-            gap: 12px;
-        }
+        .age-widget { flex: 1.4; }
+        .age-widget h2 { margin-bottom: 20px; font-size: 22px; font-weight: 600; }
+        .age-widget h2 span { color: #f1c40f; }
+        .age-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
         .time-box {
             background: rgba(0, 0, 0, 0.3);
-            padding: 15px 5px;
+            padding: 12px 5px;
             border-radius: 16px;
             border: 1px solid rgba(255,255,255,0.03);
             transition: 0.3s;
         }
-        .time-box:hover {
-            background: rgba(241, 196, 15, 0.1);
-            border-color: rgba(241, 196, 15, 0.3);
-            transform: translateY(-3px);
+        .time-box:hover { background: rgba(241, 196, 15, 0.1); border-color: rgba(241, 196, 15, 0.3); transform: translateY(-3px); }
+        .time-box span:first-child { font-size: 24px; font-weight: 800; color: #f1c40f; display: block; }
+        .time-box .label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 1.5px; }
+
+        /* CYTAT DNIA */
+        .quote-widget { flex: 0.8; }
+        .quote-widget h3 { 
+            font-size: 12px; 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            color: #f1c40f; 
+            margin-bottom: 12px;
+            font-weight: 600;
         }
-        .time-box span:first-child {
-            font-size: 28px;
-            font-weight: 800;
-            color: #f1c40f;
-            display: block;
-        }
-        .time-box .label {
-            font-size: 11px;
-            color: #999;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-top: 4px;
+        .quote-widget p {
+            font-size: 16px;
+            font-style: italic;
+            color: #e0e0e0;
+            line-height: 1.5;
+            padding: 0 10px;
         }
 
-        /* SEKCJA DAJ PRZYSMAK */
-        .treat-widget {
-            flex: 1; 
-            position: relative;
-        }
+        /* DAJ PRZYSMAK */
+        .treat-widget { flex: 1.1; position: relative; }
         .treat-btn {
             background: linear-gradient(135deg, #f1c40f, #f39c12);
             color: #111;
             border: none;
-            padding: 20px 30px;
+            padding: 18px 30px;
             font-size: 20px;
             font-family: 'Poppins', sans-serif;
             font-weight: 800;
@@ -272,26 +243,11 @@
             user-select: none;
             width: 100%;
         }
-        .treat-btn:hover {
-            transform: scale(1.03) translateY(-2px);
-            box-shadow: 0 12px 30px rgba(241, 196, 15, 0.6);
-        }
-        .treat-btn:active {
-            transform: scale(0.96);
-        }
-        .treat-counter {
-            margin-top: 25px;
-            font-size: 16px;
-            color: #aaa;
-        }
-        .treat-counter #treatCount {
-            color: #f1c40f;
-            font-weight: 800;
-            font-size: 26px;
-            margin: 0 5px;
-        }
+        .treat-btn:hover { transform: scale(1.03) translateY(-2px); box-shadow: 0 12px 30px rgba(241, 196, 15, 0.6); }
+        .treat-btn:active { transform: scale(0.96); }
+        .treat-counter { margin-top: 15px; font-size: 15px; color: #aaa; }
+        .treat-counter #treatCount { color: #f1c40f; font-weight: 800; font-size: 24px; margin: 0 5px; }
 
-        /* ANIMACJA LATAJĄCYCH PRZYSMAKÓW */
         .floating-treat {
             position: absolute;
             font-size: 35px;
@@ -299,35 +255,21 @@
             animation: floatUp 1.2s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
             z-index: 100;
         }
-
         @keyframes floatUp {
             0% { opacity: 1; transform: translate(0, 0) scale(0.8) rotate(0deg); }
             100% { opacity: 0; transform: translate(var(--offset-x), -180px) scale(1.5) rotate(var(--rotation)); }
         }
 
-        /* --- Responsywność dla małych telefonów (zabezpieczenie) --- */
         @media (max-width: 950px) {
-            body { 
-                height: auto; 
-                overflow-y: auto; 
-                display: block;
-            }
-            .app-layout { 
-                grid-template-columns: 1fr; 
-                height: auto;
-            }
-            .slider-container {
-                height: 500px;
-            }
-            .sidebar {
-                height: auto;
-            }
+            body { height: auto; overflow-y: auto; display: block; }
+            .app-layout { grid-template-columns: 1fr; height: auto; }
+            .slider-container { height: 500px; }
+            .sidebar { height: auto; }
         }
     </style>
 </head>
 <body>
 
-    <!-- GŁÓWNY UKŁAD (GRID) -->
     <div class="app-layout">
         
         <!-- LEWA STRONA: SLIDER -->
@@ -341,12 +283,12 @@
                     <div class="slide"><img src="zdjecia/4.jpg" alt="Zdjęcie 4" loading="lazy"></div>
                     <div class="slide"><img src="zdjecia/5.jpg" alt="Zdjęcie 5" loading="lazy"></div>
                     <div class="slide"><img src="zdjecia/6.jpg" alt="Zdjęcie 6" loading="lazy"></div>
-                    <div class="slide"><img src="zdjecia/7.jpg" alt="Zdjęcie 7" loading="lazy"></div>
-                    <div class="slide"><img src="zdjecia/8.jpg" alt="Zdjęcie 8" loading="lazy"></div>
-                    <div class="slide"><img src="zdjecia/9.jpg" alt="Zdjęcie 9" loading="lazy"></div>
-                    <div class="slide"><img src="zdjecia/10.jpg" alt="Zdjęcie 10" loading="lazy"></div>
-                    <div class="slide"><img src="zdjecia/11.jpg" alt="Zdjęcie 11" loading="lazy"></div>
-                    <div class="slide"><img src="zdjecia/12.jpg" alt="Zdjęcie 12" loading="lazy"></div>
+                    <div class="slide"><img src="zdjecia/7.jpg" alt="Zdjęcie 6" loading="lazy"></div>
+                    <div class="slide"><img src="zdjecia/8.jpg" alt="Zdjęcie 6" loading="lazy"></div>
+                    <div class="slide"><img src="zdjecia/9.jpg" alt="Zdjęcie 6" loading="lazy"></div>
+                    <div class="slide"><img src="zdjecia/10.jpg" alt="Zdjęcie 6" loading="lazy"></div>
+                    <div class="slide"><img src="zdjecia/11.jpg" alt="Zdjęcie 6" loading="lazy"></div>
+                    <div class="slide"><img src="zdjecia/12.jpg" alt="Zdjęcie 6" loading="lazy"></div>
                 </div>
 
                 <button class="prev" onclick="changeSlide(-1)">&#10094;</button>
@@ -368,7 +310,7 @@
         <!-- PRAWA STRONA: BOCZNY PANEL -->
         <div class="sidebar">
             
-            <!-- LICZNIK WIEKU BENA -->
+            <!-- 1. LICZNIK WIEKU -->
             <div class="widget-box age-widget">
                 <h2>🐶 Ben jest z nami <span>dokładnie</span></h2>
                 <div class="age-grid">
@@ -381,7 +323,13 @@
                 </div>
             </div>
 
-            <!-- SEKCJA DAJ PRZYSMAK -->
+            <!-- 2. CYTAT DNIA -->
+            <div class="widget-box quote-widget">
+                <h3>💬 Myśl dnia</h3>
+                <p id="benQuote">"Pobieranie myśli..."</p>
+            </div>
+
+            <!-- 3. DAJ PRZYSMAK -->
             <div class="widget-box treat-widget" id="treatSection">
                 <button class="treat-btn" onclick="giveTreat(event)">🦴 Daj przysmak!</button>
                 <div class="treat-counter">
@@ -401,9 +349,6 @@
         let progressWidth = 0;
         const slideDuration = 5000;
 
-        let touchStartX = 0;
-        let touchEndX = 0;
-
         generateThumbnails();
         showSlides(slideIndex);
         startAutoSlide();
@@ -412,7 +357,6 @@
             const slides = document.querySelectorAll(".slide img");
             const thumbsContainer = document.getElementById("thumbnailsContainer");
             thumbsContainer.innerHTML = "";
-            
             slides.forEach((img, index) => {
                 const thumb = document.createElement("img");
                 thumb.src = img.src;
@@ -433,47 +377,30 @@
             let movePercentage = (slideIndex - 1) * -100;
             track.style.transform = `translateX(${movePercentage}%)`;
             
-            for (let i = 0; i < thumbs.length; i++) {
-                thumbs[i].className = thumbs[i].className.replace(" active-thumb", "");
-            }
+            for (let i = 0; i < thumbs.length; i++) { thumbs[i].className = thumbs[i].className.replace(" active-thumb", ""); }
             
             if (thumbs.length > 0) {
                 thumbs[slideIndex - 1].className += " active-thumb";
                 thumbs[slideIndex - 1].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
             }
-            
             resetProgressBar();
         }
 
-        function changeSlide(n) {
-            showSlides(slideIndex += n);
-            if(isPlaying) resetAutoSlide();
-        }
-
-        function currentSlide(n) {
-            showSlides(slideIndex = n);
-            if(isPlaying) resetAutoSlide();
-        }
+        function changeSlide(n) { showSlides(slideIndex += n); if(isPlaying) resetAutoSlide(); }
+        function currentSlide(n) { showSlides(slideIndex = n); if(isPlaying) resetAutoSlide(); }
 
         function startAutoSlide() {
             if (!isPlaying) return;
-            autoSlideTimer = setInterval(() => {
-                slideIndex++;
-                showSlides(slideIndex);
-            }, slideDuration);
+            autoSlideTimer = setInterval(() => { slideIndex++; showSlides(slideIndex); }, slideDuration);
             startProgressBar();
         }
 
-        function resetAutoSlide() {
-            clearInterval(autoSlideTimer);
-            if(isPlaying) startAutoSlide();
-        }
+        function resetAutoSlide() { clearInterval(autoSlideTimer); if(isPlaying) startAutoSlide(); }
 
         function startProgressBar() {
             clearInterval(progressTimer);
             progressWidth = 0;
             const progressBar = document.getElementById("progressBar");
-            
             progressTimer = setInterval(() => {
                 progressWidth += (50 / slideDuration) * 100;
                 progressBar.style.width = progressWidth + "%";
@@ -483,8 +410,7 @@
 
         function resetProgressBar() {
             clearInterval(progressTimer);
-            const progressBar = document.getElementById("progressBar");
-            progressBar.style.width = "0%";
+            document.getElementById("progressBar").style.width = "0%";
             if(isPlaying) startProgressBar();
         }
 
@@ -507,32 +433,15 @@
             if (!document.fullscreenElement) {
                 if (slider.requestFullscreen) { slider.requestFullscreen(); } 
                 else if (slider.webkitRequestFullscreen) { slider.webkitRequestFullscreen(); } 
-                else if (slider.msRequestFullscreen) { slider.msRequestFullscreen(); }
             } else {
                 if (document.exitFullscreen) { document.exitFullscreen(); }
             }
         }
 
-        const sliderWrapper = document.querySelector('.slides-wrapper');
-        sliderWrapper.addEventListener('touchstart', (e) => {
-            touchStartX = e.changedTouches[0].screenX;
-        }, { passive: true });
 
-        sliderWrapper.addEventListener('touchend', (e) => {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        }, { passive: true });
-
-        function handleSwipe() {
-            const threshold = 50;
-            if (touchStartX - touchEndX > threshold) { changeSlide(1); }
-            if (touchEndX - touchStartX > threshold) { changeSlide(-1); }
-        }
-
-
-        // --- SKRYPT LICZNIKA WIEKU BENA ---
+        // --- SKRYPT LICZNIKA WIEKU ---
         function calculateDogAge() {
-            const birthDate = new Date('2022-08-15T00:00:00');
+            const birthDate = new Date('2022-08-15T00:00:00'); // Tu ustaw poprawną datę
             const now = new Date();
 
             let years = now.getFullYear() - birthDate.getFullYear();
@@ -545,11 +454,7 @@
             if (seconds < 0) { seconds += 60; minutes--; }
             if (minutes < 0) { minutes += 60; hours--; }
             if (hours < 0) { hours += 24; days--; }
-            if (days < 0) {
-                const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
-                days += prevMonth.getDate();
-                months--;
-            }
+            if (days < 0) { const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0); days += prevMonth.getDate(); months--; }
             if (months < 0) { months += 12; years--; }
 
             const formatTime = (num) => num < 10 ? '0' + num : num;
@@ -561,9 +466,39 @@
             document.getElementById('c-minutes').innerText = formatTime(minutes);
             document.getElementById('c-seconds').innerText = formatTime(seconds);
         }
-
         calculateDogAge();
         setInterval(calculateDogAge, 1000);
+
+
+        // --- SKRYPT CYTATU DNIA ---
+        const benQuotes = [
+            "Jeśli coś spadło na podłogę, to oficjalnie należy do mnie.",
+            "Spacer nie jest opcją, to styl życia.",
+            "Patrzę na ciebie nie dlatego, że cię kocham, tylko dlatego, że jesz.",
+            "Moim ulubionym sportem jest spanie w poprzek łóżka.",
+            "Ogon sam się nie pomerda. No, chyba że powiesz 'Idziemy?'.",
+            "Dźwięk otwieranej lodówki to najpiękniejsza symfonia na świecie.",
+            "Człowiek myśli, że to on mnie wyprowadza. Słodki, naiwny człowiek.",
+            "Każda pora jest dobra na drzemkę. Szczególnie tuż po drzemce.",
+            "Nie jestem głodny. Ale zjem, z szacunku do jedzenia.",
+            "Koty są dziwne. Kto normalny załatwia się w domu do pudełka?",
+            "Zasada trzech sekund nie istnieje. Pół sekundy i zjedzone.",
+            "Jeśli nie chcesz, żebym to zjadł, to dlaczego leżało na stole?",
+            "Kanapa to moje królestwo. Ty możesz zająć ten mały róg.",
+            "Moja praca to szczekanie na kuriera. Robię to z powołania.",
+            "Życie jest za krótkie. Zjedz pańskiego buta."
+        ];
+
+        function setDailyQuote() {
+            const today = new Date();
+            // Tworzymy unikalną liczbę dla każdego dnia (np. 20260913), 
+            // dzięki temu cytat zmieni się dokładnie o północy.
+            const dateNum = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+            const quoteIndex = dateNum % benQuotes.length;
+            
+            document.getElementById('benQuote').innerText = `"${benQuotes[quoteIndex]}"`;
+        }
+        setDailyQuote();
 
 
         // --- SKRYPT DAJ PRZYSMAK ---
@@ -584,14 +519,12 @@
                 treat.className = 'floating-treat';
                 treat.innerText = treats[Math.floor(Math.random() * treats.length)];
                 
-                // Pozycja startowa (środek przycisku)
                 const clickX = event.clientX - rect.left;
                 const clickY = event.clientY - rect.top;
 
                 treat.style.left = `${clickX}px`;
                 treat.style.top = `${clickY}px`;
 
-                // Losowy rozrzut animacji
                 const offsetX = (Math.random() - 0.5) * 200;
                 const rotation = (Math.random() - 0.5) * 200;
                 
@@ -599,7 +532,6 @@
                 treat.style.setProperty('--rotation', `${rotation}deg`);
 
                 section.appendChild(treat);
-                
                 setTimeout(() => { treat.remove(); }, 1200);
             }
         }
