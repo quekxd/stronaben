@@ -8,533 +8,165 @@
     
     <!-- Import nowoczesnej czcionki -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
-    
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #18181f 0%, #0a0a0c 100%);
-            color: #ffffff;
-            height: 100vh;
-            overflow: hidden; /* BLOKADA SCROLLOWANIA NA EKRANIE */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .app-layout {
-            display: grid;
-            grid-template-columns: 1fr 380px;
-            gap: 25px;
-            width: 100%;
-            max-width: 1600px;
-            height: 100%;
-            max-height: 900px;
-        }
-
-        /* --- SLIDER --- */
-        .slider-container {
-            position: relative;
-            background-color: #000;
-            border-radius: 24px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .slides-wrapper {
-            flex: 1;
-            position: relative;
-            background-color: #000;
-            overflow: hidden;
-        }
-        
-        .slides-track {
-            display: flex;
-            width: 100%;
-            height: 100%;
-            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-        
-        .slide {
-            flex: 0 0 100%;
-            width: 100%;
-            height: 100%;
-        }
-        
-        .slide img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            display: block;
-        }
-
-        .prev, .next {
-            cursor: pointer;
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            padding: 15px 20px;
-            color: white;
-            font-size: 24px;
-            transition: 0.3s ease;
-            background-color: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(5px);
-            border: none;
-            border-radius: 0 12px 12px 0;
-            z-index: 10;
-        }
-        .next { right: 0; border-radius: 12px 0 0 12px; }
-        .prev:hover, .next:hover { background-color: rgba(241, 196, 15, 0.8); color: #000; }
-
-        .progress-container {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background-color: rgba(255, 255, 255, 0.1);
-            z-index: 10;
-        }
-        .progress-bar {
-            height: 100%;
-            width: 0%;
-            background-color: #f1c40f;
-            box-shadow: 0 0 10px #f1c40f;
-        }
-
-        .top-controls {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 12px;
-            z-index: 10;
-        }
-        .top-controls button {
-            background-color: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(8px);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.1);
-            cursor: pointer;
-            width: 44px;
-            height: 44px;
-            font-size: 18px;
-            border-radius: 12px;
-            transition: 0.3s;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .top-controls button:hover {
-            background-color: rgba(241, 196, 15, 0.9);
-            border-color: #f1c40f;
-            color: #000;
-        }
-
-        .thumbnails-container {
-            height: 85px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 0 15px;
-            background-color: rgba(10, 10, 12, 0.9);
-            overflow-x: auto;
-            border-top: 1px solid rgba(255,255,255,0.05);
-        }
-        .thumbnails-container::-webkit-scrollbar { display: none; }
-        
-        .thumbnail {
-            cursor: pointer;
-            height: 55px;
-            width: 85px;
-            object-fit: cover;
-            opacity: 0.3;
-            transition: all 0.4s ease;
-            border-radius: 8px;
-            border: 2px solid transparent;
-        }
-        .active-thumb, .thumbnail:hover {
-            opacity: 1;
-            transform: scale(1.05);
-            border-color: #f1c40f;
-            box-shadow: 0 4px 10px rgba(241, 196, 15, 0.3);
-        }
-
-        /* --- BOCZNY PANEL --- */
-        .sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            height: 100%;
-        }
-
-        .widget-box {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 25px 20px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        /* LICZNIK WIEKU */
-        .age-widget { flex: 1.4; }
-        .age-widget h2 { margin-bottom: 20px; font-size: 22px; font-weight: 600; }
-        .age-widget h2 span { color: #f1c40f; }
-        .age-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-        .time-box {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 12px 5px;
-            border-radius: 16px;
-            border: 1px solid rgba(255,255,255,0.03);
-            transition: 0.3s;
-        }
-        .time-box:hover { background: rgba(241, 196, 15, 0.1); border-color: rgba(241, 196, 15, 0.3); transform: translateY(-3px); }
-        .time-box span:first-child { font-size: 24px; font-weight: 800; color: #f1c40f; display: block; }
-        .time-box .label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 1.5px; }
-
-        /* CYTAT DNIA */
-        .quote-widget { flex: 0.8; }
-        .quote-widget h3 { 
-            font-size: 12px; 
-            text-transform: uppercase; 
-            letter-spacing: 2px; 
-            color: #f1c40f; 
-            margin-bottom: 12px;
-            font-weight: 600;
-        }
-        .quote-widget p {
-            font-size: 16px;
-            font-style: italic;
-            color: #e0e0e0;
-            line-height: 1.5;
-            padding: 0 10px;
-        }
-
-        /* DAJ PRZYSMAK */
-        .treat-widget { flex: 1.1; position: relative; }
-        .treat-btn {
-            background: linear-gradient(135deg, #f1c40f, #f39c12);
-            color: #111;
-            border: none;
-            padding: 18px 30px;
-            font-size: 20px;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 800;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 8px 25px rgba(241, 196, 15, 0.4);
-            user-select: none;
-            width: 100%;
-        }
-        .treat-btn:hover { transform: scale(1.03) translateY(-2px); box-shadow: 0 12px 30px rgba(241, 196, 15, 0.6); }
-        .treat-btn:active { transform: scale(0.96); }
-        .treat-counter { margin-top: 15px; font-size: 15px; color: #aaa; }
-        .treat-counter #treatCount { color: #f1c40f; font-weight: 800; font-size: 24px; margin: 0 5px; }
-
-        .floating-treat {
-            position: absolute;
-            font-size: 35px;
-            pointer-events: none;
-            animation: floatUp 1.2s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
-            z-index: 100;
-        }
-        @keyframes floatUp {
-            0% { opacity: 1; transform: translate(0, 0) scale(0.8) rotate(0deg); }
-            100% { opacity: 0; transform: translate(var(--offset-x), -180px) scale(1.5) rotate(var(--rotation)); }
-        }
-
-        @media (max-width: 950px) {
-            body { height: auto; overflow-y: auto; display: block; }
-            .app-layout { grid-template-columns: 1fr; height: auto; }
-            .slider-container { height: 500px; }
-            .sidebar { height: auto; }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="app-layout">
+    <div class="app-layout" id="appLayout">
         
-        <!-- LEWA STRONA: SLIDER -->
-        <div class="slider-container" id="sliderContainer">
-            <div class="slides-wrapper">
-                <div class="slides-track" id="slidesTrack">
-                    <!-- Zmień atrybuty src na swoje zdjęcia -->
-                    <div class="slide"><img src="zdjecia/1.jpg" alt="Zdjęcie 1" loading="lazy"></div>
-                    <div class="slide"><img src="zdjecia/2.jpg" alt="Zdjęcie 2" loading="lazy"></div>
-                    <div class="slide"><img src="zdjecia/3.jpg" alt="Zdjęcie 3" loading="lazy"></div>
-                    <div class="slide"><img src="zdjecia/4.jpg" alt="Zdjęcie 4" loading="lazy"></div>
-                    <div class="slide"><img src="zdjecia/5.jpg" alt="Zdjęcie 5" loading="lazy"></div>
-                    <div class="slide"><img src="zdjecia/6.jpg" alt="Zdjęcie 6" loading="lazy"></div>
-                    <div class="slide"><img src="zdjecia/7.jpg" alt="Zdjęcie 6" loading="lazy"></div>
-                    <div class="slide"><img src="zdjecia/8.jpg" alt="Zdjęcie 6" loading="lazy"></div>
-                    <div class="slide"><img src="zdjecia/9.jpg" alt="Zdjęcie 6" loading="lazy"></div>
-                    <div class="slide"><img src="zdjecia/10.jpg" alt="Zdjęcie 6" loading="lazy"></div>
-                    <div class="slide"><img src="zdjecia/11.jpg" alt="Zdjęcie 6" loading="lazy"></div>
-                    <div class="slide"><img src="zdjecia/12.jpg" alt="Zdjęcie 6" loading="lazy"></div>
+        <!-- SLOT 0: GŁÓWNY (DUŻY) -->
+        <div class="panel-slot slot-large" data-slot-id="0" id="slot-0">
+            <!-- 1. SLIDER ZE ZDJĘCIAMI -->
+            <div class="app-panel panel-slider slider-container" id="panel-slider" data-panel-id="panel-slider">
+                <div class="drag-handle" title="Przeciągnij panel">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                        <circle cx="8" cy="6" r="2"/>
+                        <circle cx="16" cy="6" r="2"/>
+                        <circle cx="8" cy="12" r="2"/>
+                        <circle cx="16" cy="12" r="2"/>
+                        <circle cx="8" cy="18" r="2"/>
+                        <circle cx="16" cy="18" r="2"/>
+                    </svg>
                 </div>
 
-                <button class="prev" onclick="changeSlide(-1)">&#10094;</button>
-                <button class="next" onclick="changeSlide(1)">&#10095;</button>
+                <div class="slides-wrapper">
+                    <div class="slides-track" id="slidesTrack">
+                        <!-- Zmień atrybuty src na swoje zdjęcia -->
+                        <div class="slide"><img src="zdjecia/1.jpg" alt="Zdjęcie 1" loading="lazy"></div>
+                        <div class="slide"><img src="zdjecia/2.jpg" alt="Zdjęcie 2" loading="lazy"></div>
+                        <div class="slide"><img src="zdjecia/3.jpg" alt="Zdjęcie 3" loading="lazy"></div>
+                        <div class="slide"><img src="zdjecia/4.jpg" alt="Zdjęcie 4" loading="lazy"></div>
+                        <div class="slide"><img src="zdjecia/5.jpg" alt="Zdjęcie 5" loading="lazy"></div>
+                        <div class="slide"><img src="zdjecia/6.jpg" alt="Zdjęcie 6" loading="lazy"></div>
+                        <div class="slide"><img src="zdjecia/7.jpg" alt="Zdjęcie 7" loading="lazy"></div>
+                        <div class="slide"><img src="zdjecia/8.jpg" alt="Zdjęcie 8" loading="lazy"></div>
+                        <div class="slide"><img src="zdjecia/9.jpg" alt="Zdjęcie 9" loading="lazy"></div>
+                        <div class="slide"><img src="zdjecia/10.jpg" alt="Zdjęcie 10" loading="lazy"></div>
+                        <div class="slide"><img src="zdjecia/11.jpg" alt="Zdjęcie 11" loading="lazy"></div>
+                        <div class="slide"><img src="zdjecia/12.jpg" alt="Zdjęcie 12" loading="lazy"></div>
+                    </div>
 
-                <div class="top-controls">
-                    <button id="playPauseBtn" onclick="togglePlayPause()" title="Zatrzymaj/Wznów">&#10074;&#10074;</button>
-                    <button id="fullscreenBtn" onclick="toggleFullscreen()" title="Pełny ekran">&#9974;</button>
-                </div>
+                    <button class="prev" onclick="changeSlide(-1)">&#10094;</button>
+                    <button class="next" onclick="changeSlide(1)">&#10095;</button>
 
-                <div class="progress-container">
-                    <div class="progress-bar" id="progressBar"></div>
+                    <div class="top-controls">
+                        <button id="playPauseBtn" onclick="togglePlayPause()" title="Zatrzymaj/Wznów">&#10074;&#10074;</button>
+                        <button id="fullscreenBtn" onclick="toggleFullscreen()" title="Pełny ekran">&#9974;</button>
+                    </div>
+
+                    <div class="progress-container">
+                        <div class="progress-bar" id="progressBar"></div>
+                    </div>
                 </div>
+                
+                <div class="thumbnails-container" id="thumbnailsContainer"></div>
             </div>
-            
-            <div class="thumbnails-container" id="thumbnailsContainer"></div>
         </div>
 
-        <!-- PRAWA STRONA: BOCZNY PANEL -->
-        <div class="sidebar">
+        <!-- BOCZNY PANEL: 3 SLOTY -->
+        <div class="sidebar-slots" id="sidebarSlots">
             
-            <!-- 1. LICZNIK WIEKU -->
-            <div class="widget-box age-widget">
-                <h2>🐶 Ben jest z nami <span>dokładnie</span></h2>
-                <div class="age-grid">
-                    <div class="time-box"><span id="c-years">0</span><span class="label">Lata</span></div>
-                    <div class="time-box"><span id="c-months">0</span><span class="label">Mies.</span></div>
-                    <div class="time-box"><span id="c-days">0</span><span class="label">Dni</span></div>
-                    <div class="time-box"><span id="c-hours">0</span><span class="label">Godz.</span></div>
-                    <div class="time-box"><span id="c-minutes">0</span><span class="label">Minut</span></div>
-                    <div class="time-box"><span id="c-seconds">0</span><span class="label">Sekund</span></div>
+            <!-- SLOT 1 -->
+            <div class="panel-slot slot-small" data-slot-id="1" id="slot-1">
+                <!-- LICZNIK WIEKU -->
+                <div class="app-panel widget-box age-widget" id="panel-age" data-panel-id="panel-age">
+                    <div class="drag-handle" title="Przeciągnij panel">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                            <circle cx="8" cy="6" r="2"/>
+                            <circle cx="16" cy="6" r="2"/>
+                            <circle cx="8" cy="12" r="2"/>
+                            <circle cx="16" cy="12" r="2"/>
+                            <circle cx="8" cy="18" r="2"/>
+                            <circle cx="16" cy="18" r="2"/>
+                        </svg>
+                    </div>
+                    <div class="widget-header">
+                        <h2>🐶 Ben jest z nami <span>dokładnie</span></h2>
+                        <p class="widget-subtitle">Każda sekunda z nim to czysta radość! 🐾</p>
+                    </div>
+                    <div class="age-grid">
+                        <div class="time-box"><span id="c-years">0</span><span class="label">Lata</span></div>
+                        <div class="time-box"><span id="c-months">0</span><span class="label">Mies.</span></div>
+                        <div class="time-box"><span id="c-days">0</span><span class="label">Dni</span></div>
+                        <div class="time-box"><span id="c-hours">0</span><span class="label">Godz.</span></div>
+                        <div class="time-box"><span id="c-minutes">0</span><span class="label">Minut</span></div>
+                        <div class="time-box"><span id="c-seconds">0</span><span class="label">Sekund</span></div>
+                    </div>
+                    <div class="age-footer">
+                        <span class="badge">Urodziny Bena: 15 sierpnia 2022 🎂</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- 2. CYTAT DNIA -->
-            <div class="widget-box quote-widget">
-                <h3>💬 Myśl dnia</h3>
-                <p id="benQuote">"Pobieranie myśli..."</p>
+            <!-- SLOT 2 -->
+            <div class="panel-slot slot-small" data-slot-id="2" id="slot-2">
+                <!-- CYTAT DNIA -->
+                <div class="app-panel widget-box quote-widget" id="panel-quote" data-panel-id="panel-quote">
+                    <div class="drag-handle" title="Przeciągnij panel">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                            <circle cx="8" cy="6" r="2"/>
+                            <circle cx="16" cy="6" r="2"/>
+                            <circle cx="8" cy="12" r="2"/>
+                            <circle cx="16" cy="12" r="2"/>
+                            <circle cx="8" cy="18" r="2"/>
+                            <circle cx="16" cy="18" r="2"/>
+                        </svg>
+                    </div>
+                    <div class="quote-header">
+                        <h3>💬 Myśl dnia</h3>
+                        <button class="quote-refresh-btn" onclick="getRandomQuote(event)" title="Wylosuj inną myśl">&#8635; Losuj</button>
+                    </div>
+                    <div class="quote-body">
+                        <span class="quote-mark quote-open">&ldquo;</span>
+                        <p id="benQuote">"Pobieranie myśli..."</p>
+                        <span class="quote-mark quote-close">&rdquo;</span>
+                    </div>
+                    <div class="quote-author">&mdash; Ben, filozof na czterech łapach 🐾</div>
+                </div>
             </div>
 
-            <!-- 3. DAJ PRZYSMAK -->
-            <div class="widget-box treat-widget" id="treatSection">
-                <button class="treat-btn" onclick="giveTreat(event)">🦴 Daj przysmak!</button>
-                <div class="treat-counter">
-                    Rozdano już <br><span id="treatCount">0</span> smakołyków 🥩
+            <!-- SLOT 3 -->
+            <div class="panel-slot slot-small" data-slot-id="3" id="slot-3">
+                <!-- DAJ PRZYSMAK -->
+                <div class="app-panel widget-box treat-widget" id="panel-treat" data-panel-id="panel-treat">
+                    <div class="drag-handle" title="Przeciągnij panel">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                            <circle cx="8" cy="6" r="2"/>
+                            <circle cx="16" cy="6" r="2"/>
+                            <circle cx="8" cy="12" r="2"/>
+                            <circle cx="16" cy="12" r="2"/>
+                            <circle cx="8" cy="18" r="2"/>
+                            <circle cx="16" cy="18" r="2"/>
+                        </svg>
+                    </div>
+                    <div class="treat-inner" id="treatSection">
+                        <button class="treat-btn" onclick="giveTreat(event)">🦴 Daj przysmak!</button>
+                        <div class="treat-counter">
+                            Rozdano już <br><span id="treatCount">0</span> smakołyków 🥩
+                        </div>
+                        <div class="treat-bonus-bar">
+                            <span class="treat-tag" onclick="giveSpecialTreat(event, '🦴')">🦴 Kość</span>
+                            <span class="treat-tag" onclick="giveSpecialTreat(event, '🥩')">🥩 Stek</span>
+                            <span class="treat-tag" onclick="giveSpecialTreat(event, '🥓')">🥓 Boczek</span>
+                            <span class="treat-tag" onclick="giveSpecialTreat(event, '🍗')">🍗 Udko</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
         </div>
     </div>
 
-    <script>
-        // --- SKRYPT SLIDERA ---
-        let slideIndex = 1;
-        let isPlaying = true;
-        let autoSlideTimer;
-        let progressTimer;
-        let progressWidth = 0;
-        const slideDuration = 5000;
+    <!-- PRZYCISK RESETU UKŁADU -->
+    <button class="reset-layout-btn" id="resetLayoutBtn" onclick="resetLayout()" title="Przywróć domyślny układ paneli">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+            <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+        <span>Resetuj układ</span>
+    </button>
 
-        generateThumbnails();
-        showSlides(slideIndex);
-        startAutoSlide();
+    <!-- KONTENER NA ELEMENTY-WIDMA (GHOST) PODCZAS PRZECIĄGANIA -->
+    <div id="dragGhostContainer"></div>
 
-        function generateThumbnails() {
-            const slides = document.querySelectorAll(".slide img");
-            const thumbsContainer = document.getElementById("thumbnailsContainer");
-            thumbsContainer.innerHTML = "";
-            slides.forEach((img, index) => {
-                const thumb = document.createElement("img");
-                thumb.src = img.src;
-                thumb.className = "thumbnail";
-                thumb.onclick = () => currentSlide(index + 1);
-                thumbsContainer.appendChild(thumb);
-            });
-        }
-
-        function showSlides(n) {
-            let slides = document.getElementsByClassName("slide");
-            let thumbs = document.getElementsByClassName("thumbnail");
-            const track = document.getElementById("slidesTrack");
-            
-            if (n > slides.length) { slideIndex = 1; }
-            if (n < 1) { slideIndex = slides.length; }
-            
-            let movePercentage = (slideIndex - 1) * -100;
-            track.style.transform = `translateX(${movePercentage}%)`;
-            
-            for (let i = 0; i < thumbs.length; i++) { thumbs[i].className = thumbs[i].className.replace(" active-thumb", ""); }
-            
-            if (thumbs.length > 0) {
-                thumbs[slideIndex - 1].className += " active-thumb";
-                thumbs[slideIndex - 1].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-            }
-            resetProgressBar();
-        }
-
-        function changeSlide(n) { showSlides(slideIndex += n); if(isPlaying) resetAutoSlide(); }
-        function currentSlide(n) { showSlides(slideIndex = n); if(isPlaying) resetAutoSlide(); }
-
-        function startAutoSlide() {
-            if (!isPlaying) return;
-            autoSlideTimer = setInterval(() => { slideIndex++; showSlides(slideIndex); }, slideDuration);
-            startProgressBar();
-        }
-
-        function resetAutoSlide() { clearInterval(autoSlideTimer); if(isPlaying) startAutoSlide(); }
-
-        function startProgressBar() {
-            clearInterval(progressTimer);
-            progressWidth = 0;
-            const progressBar = document.getElementById("progressBar");
-            progressTimer = setInterval(() => {
-                progressWidth += (50 / slideDuration) * 100;
-                progressBar.style.width = progressWidth + "%";
-                if(progressWidth >= 100) progressWidth = 0;
-            }, 50);
-        }
-
-        function resetProgressBar() {
-            clearInterval(progressTimer);
-            document.getElementById("progressBar").style.width = "0%";
-            if(isPlaying) startProgressBar();
-        }
-
-        function togglePlayPause() {
-            const btn = document.getElementById("playPauseBtn");
-            if (isPlaying) {
-                isPlaying = false;
-                clearInterval(autoSlideTimer);
-                clearInterval(progressTimer);
-                btn.innerHTML = "&#9658;";
-            } else {
-                isPlaying = true;
-                btn.innerHTML = "&#10074;&#10074;";
-                resetAutoSlide();
-            }
-        }
-
-        function toggleFullscreen() {
-            const slider = document.getElementById("sliderContainer");
-            if (!document.fullscreenElement) {
-                if (slider.requestFullscreen) { slider.requestFullscreen(); } 
-                else if (slider.webkitRequestFullscreen) { slider.webkitRequestFullscreen(); } 
-            } else {
-                if (document.exitFullscreen) { document.exitFullscreen(); }
-            }
-        }
-
-
-        // --- SKRYPT LICZNIKA WIEKU ---
-        function calculateDogAge() {
-            const birthDate = new Date('2022-08-15T00:00:00'); // Tu ustaw poprawną datę
-            const now = new Date();
-
-            let years = now.getFullYear() - birthDate.getFullYear();
-            let months = now.getMonth() - birthDate.getMonth();
-            let days = now.getDate() - birthDate.getDate();
-            let hours = now.getHours() - birthDate.getHours();
-            let minutes = now.getMinutes() - birthDate.getMinutes();
-            let seconds = now.getSeconds() - birthDate.getSeconds();
-
-            if (seconds < 0) { seconds += 60; minutes--; }
-            if (minutes < 0) { minutes += 60; hours--; }
-            if (hours < 0) { hours += 24; days--; }
-            if (days < 0) { const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0); days += prevMonth.getDate(); months--; }
-            if (months < 0) { months += 12; years--; }
-
-            const formatTime = (num) => num < 10 ? '0' + num : num;
-
-            document.getElementById('c-years').innerText = years;
-            document.getElementById('c-months').innerText = months;
-            document.getElementById('c-days').innerText = days;
-            document.getElementById('c-hours').innerText = formatTime(hours);
-            document.getElementById('c-minutes').innerText = formatTime(minutes);
-            document.getElementById('c-seconds').innerText = formatTime(seconds);
-        }
-        calculateDogAge();
-        setInterval(calculateDogAge, 1000);
-
-
-        // --- SKRYPT CYTATU DNIA ---
-        const benQuotes = [
-            "Jeśli coś spadło na podłogę, to oficjalnie należy do mnie.",
-            "Spacer nie jest opcją, to styl życia.",
-            "Patrzę na ciebie nie dlatego, że cię kocham, tylko dlatego, że jesz.",
-            "Moim ulubionym sportem jest spanie w poprzek łóżka.",
-            "Ogon sam się nie pomerda. No, chyba że powiesz 'Idziemy?'.",
-            "Dźwięk otwieranej lodówki to najpiękniejsza symfonia na świecie.",
-            "Człowiek myśli, że to on mnie wyprowadza. Słodki, naiwny człowiek.",
-            "Każda pora jest dobra na drzemkę. Szczególnie tuż po drzemce.",
-            "Nie jestem głodny. Ale zjem, z szacunku do jedzenia.",
-            "Koty są dziwne. Kto normalny załatwia się w domu do pudełka?",
-            "Zasada trzech sekund nie istnieje. Pół sekundy i zjedzone.",
-            "Jeśli nie chcesz, żebym to zjadł, to dlaczego leżało na stole?",
-            "Kanapa to moje królestwo. Ty możesz zająć ten mały róg.",
-            "Moja praca to szczekanie na kuriera. Robię to z powołania.",
-            "Życie jest za krótkie. Zjedz pańskiego buta."
-        ];
-
-        function setDailyQuote() {
-            const today = new Date();
-            // Tworzymy unikalną liczbę dla każdego dnia (np. 20260913), 
-            // dzięki temu cytat zmieni się dokładnie o północy.
-            const dateNum = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
-            const quoteIndex = dateNum % benQuotes.length;
-            
-            document.getElementById('benQuote').innerText = `"${benQuotes[quoteIndex]}"`;
-        }
-        setDailyQuote();
-
-
-        // --- SKRYPT DAJ PRZYSMAK ---
-        let treatCount = parseInt(localStorage.getItem('benTreatsCount')) || 0;
-        document.getElementById('treatCount').innerText = treatCount;
-
-        function giveTreat(event) {
-            treatCount++;
-            document.getElementById('treatCount').innerText = treatCount;
-            localStorage.setItem('benTreatsCount', treatCount);
-
-            const treats = ['🦴', '🥩', '🥓', '🍗'];
-            const section = document.getElementById('treatSection');
-            const rect = section.getBoundingClientRect();
-
-            for (let i = 0; i < 5; i++) {
-                const treat = document.createElement('div');
-                treat.className = 'floating-treat';
-                treat.innerText = treats[Math.floor(Math.random() * treats.length)];
-                
-                const clickX = event.clientX - rect.left;
-                const clickY = event.clientY - rect.top;
-
-                treat.style.left = `${clickX}px`;
-                treat.style.top = `${clickY}px`;
-
-                const offsetX = (Math.random() - 0.5) * 200;
-                const rotation = (Math.random() - 0.5) * 200;
-                
-                treat.style.setProperty('--offset-x', `${offsetX}px`);
-                treat.style.setProperty('--rotation', `${rotation}deg`);
-
-                section.appendChild(treat);
-                setTimeout(() => { treat.remove(); }, 1200);
-            }
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>

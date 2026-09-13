@@ -1,0 +1,821 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #18181f 0%, #0a0a0c 100%);
+    color: #ffffff;
+    height: 100vh;
+    overflow: hidden; /* BLOKADA SCROLLOWANIA NA EKRANIE KOMPUTERA */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    user-select: none;
+}
+
+/* GŁÓWNY UKŁAD STRONY */
+.app-layout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 24px;
+    width: 100%;
+    max-width: 1600px;
+    height: 100%;
+    max-height: 900px;
+    position: relative;
+}
+
+/* SYSTEM SLOTÓW */
+.panel-slot {
+    position: relative;
+    border-radius: 24px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    border: 2px dashed transparent;
+    transition: border-color 0.25s ease, background-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.slot-large {
+    height: 100%;
+    width: 100%;
+}
+
+.sidebar-slots {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    height: 100%;
+    min-height: 0;
+}
+
+.slot-small {
+    flex: 1;
+    min-height: 0;
+}
+
+/* EFEKT NAJECHANIA NA SLOT DOCELOWY W TRAKCIE PRZECIĄGANIA */
+.panel-slot.drop-target-active {
+    border-color: #f1c40f !important;
+    background: rgba(241, 196, 15, 0.08) !important;
+    box-shadow: 0 0 30px rgba(241, 196, 15, 0.25), inset 0 0 15px rgba(241, 196, 15, 0.15);
+    transform: scale(1.015);
+}
+
+.panel-slot.drop-target-active .app-panel {
+    opacity: 0.65;
+    transform: scale(0.98);
+}
+
+/* WSPÓLNE STYLE DLA KAŻDEGO PANELU */
+.app-panel {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    border-radius: 24px;
+    will-change: transform;
+    cursor: grab;
+    transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.app-panel:active {
+    cursor: grabbing;
+}
+
+/* UCHWYT DO PRZECIĄGANIA (TYLKO IKONA ⠿) */
+.drag-handle {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.55);
+    cursor: grab;
+    z-index: 30;
+    transition: all 0.2s ease;
+}
+
+.drag-handle:hover {
+    color: #f1c40f;
+    background: rgba(241, 196, 15, 0.15);
+    border-color: rgba(241, 196, 15, 0.5);
+    transform: scale(1.1);
+}
+
+.app-panel:hover .drag-handle {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* STAN W TRAKCIE PRZECIĄGANIA - ELEMENT W ORYGINALNYM LOCIE */
+.app-panel.is-dragged-placeholder {
+    opacity: 0.22 !important;
+    filter: blur(1px);
+    border: 2px dashed rgba(241, 196, 15, 0.6) !important;
+}
+
+/* ELEMENT PŁYWAJĄCY POD KURSOREM (GHOST) */
+#dragGhostContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    z-index: 999999;
+}
+
+.drag-ghost {
+    position: fixed !important;
+    margin: 0 !important;
+    pointer-events: none !important;
+    z-index: 999999 !important;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(241, 196, 15, 0.5) !important;
+    border: 2px solid #f1c40f !important;
+    border-radius: 24px !important;
+    opacity: 0.95 !important;
+    transform: scale(1.03) rotate(1.5deg);
+    cursor: grabbing !important;
+    overflow: hidden !important;
+    backdrop-filter: blur(14px) !important;
+    flex: none !important;
+}
+
+.drag-ghost,
+.drag-ghost * {
+    pointer-events: none !important;
+    user-select: none !important;
+}
+
+/* WIDŻETY OGÓLNE */
+.widget-box {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 20px 22px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+    text-align: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.widget-box:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+}
+
+/* ========================================================
+   1. PANEL SLIDERA (ZDJĘCIA PSA)
+   ======================================================== */
+.slider-container {
+    background-color: #000;
+    border-radius: 24px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.slides-wrapper {
+    flex: 1;
+    position: relative;
+    background-color: #000;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.slides-track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.slide {
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
+}
+
+.slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    pointer-events: none;
+}
+
+.prev, .next {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 14px 18px;
+    color: white;
+    font-size: 22px;
+    transition: 0.3s ease;
+    background-color: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(5px);
+    border: none;
+    border-radius: 0 12px 12px 0;
+    z-index: 10;
+}
+.next { right: 0; border-radius: 12px 0 0 12px; }
+.prev:hover, .next:hover { background-color: rgba(241, 196, 15, 0.85); color: #000; }
+
+.progress-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.12);
+    z-index: 10;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background-color: #f1c40f;
+    box-shadow: 0 0 10px #f1c40f;
+}
+
+.top-controls {
+    position: absolute;
+    top: 14px;
+    right: 56px; /* Zostawia miejsce na drag-handle */
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+}
+
+.top-controls button {
+    background-color: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(8px);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    cursor: pointer;
+    width: 38px;
+    height: 38px;
+    font-size: 16px;
+    border-radius: 10px;
+    transition: 0.25s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.top-controls button:hover {
+    background-color: rgba(241, 196, 15, 0.9);
+    border-color: #f1c40f;
+    color: #000;
+}
+
+.thumbnails-container {
+    height: 85px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 15px;
+    background-color: rgba(10, 10, 12, 0.95);
+    overflow-x: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.thumbnails-container::-webkit-scrollbar { display: none; }
+
+.thumbnail {
+    cursor: pointer;
+    height: 55px;
+    width: 85px;
+    object-fit: cover;
+    opacity: 0.35;
+    transition: all 0.35s ease;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    flex-shrink: 0;
+}
+
+.active-thumb, .thumbnail:hover {
+    opacity: 1;
+    transform: scale(1.05);
+    border-color: #f1c40f;
+    box-shadow: 0 4px 12px rgba(241, 196, 15, 0.35);
+}
+
+/* SLIDER W MAŁYM SLOCIE (KOMPAKTOWY) - TYLKO GDY NIE JEST W TRYBIE PEŁNOEKRANOWYM */
+.slot-small .slider-container:not(:fullscreen):not(:-webkit-full-screen) .slide img {
+    object-fit: cover;
+}
+.slot-small .slider-container:not(:fullscreen):not(:-webkit-full-screen) .thumbnails-container {
+    height: 48px;
+    padding: 0 10px;
+    gap: 6px;
+}
+.slot-small .slider-container:not(:fullscreen):not(:-webkit-full-screen) .thumbnail {
+    height: 34px;
+    width: 52px;
+}
+.slot-small .slider-container:not(:fullscreen):not(:-webkit-full-screen) .prev,
+.slot-small .slider-container:not(:fullscreen):not(:-webkit-full-screen) .next {
+    padding: 8px 12px;
+    font-size: 16px;
+}
+.slot-small .slider-container:not(:fullscreen):not(:-webkit-full-screen) .top-controls button {
+    width: 32px;
+    height: 32px;
+    font-size: 13px;
+    border-radius: 8px;
+}
+
+/* TRYB PEŁNOEKRANOWY SLIDERA (ZDJĘCIA ZAWSZE W CAŁOŚCI BEZ PRZYCINANIA) */
+.slider-container:fullscreen,
+.slider-container:-webkit-full-screen {
+    width: 100vw !important;
+    height: 100vh !important;
+    border-radius: 0 !important;
+    border: none !important;
+    background-color: #000 !important;
+}
+
+.slider-container:fullscreen .slide img,
+.slider-container:-webkit-full-screen .slide img {
+    object-fit: contain !important;
+}
+
+.slider-container:fullscreen .thumbnails-container,
+.slider-container:-webkit-full-screen .thumbnails-container {
+    height: 85px !important;
+    padding: 0 15px !important;
+    gap: 10px !important;
+}
+
+.slider-container:fullscreen .thumbnail,
+.slider-container:-webkit-full-screen .thumbnail {
+    height: 55px !important;
+    width: 85px !important;
+}
+
+.slider-container:fullscreen .prev,
+.slider-container:fullscreen .next,
+.slider-container:-webkit-full-screen .prev,
+.slider-container:-webkit-full-screen .next {
+    padding: 14px 18px !important;
+    font-size: 22px !important;
+}
+
+.slider-container:fullscreen .top-controls,
+.slider-container:-webkit-full-screen .top-controls {
+    top: 20px !important;
+    right: 20px !important;
+}
+
+.slider-container:fullscreen .top-controls button,
+.slider-container:-webkit-full-screen .top-controls button {
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 18px !important;
+    border-radius: 12px !important;
+}
+
+/* ========================================================
+   2. PANEL: LICZNIK WIEKU
+   ======================================================== */
+.age-widget h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.age-widget h2 span {
+    color: #f1c40f;
+}
+
+.widget-subtitle {
+    display: none;
+    font-size: 14px;
+    color: #aaa;
+    margin-bottom: 24px;
+}
+
+.age-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    width: 100%;
+}
+
+.time-box {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px 4px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    transition: 0.25s;
+}
+
+.time-box:hover {
+    background: rgba(241, 196, 15, 0.12);
+    border-color: rgba(241, 196, 15, 0.35);
+    transform: translateY(-2px);
+}
+
+.time-box span:first-child {
+    font-size: 22px;
+    font-weight: 800;
+    color: #f1c40f;
+    display: block;
+}
+
+.time-box .label {
+    font-size: 10px;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+}
+
+.age-footer {
+    display: none;
+    margin-top: 25px;
+}
+
+.badge {
+    background: rgba(241, 196, 15, 0.12);
+    border: 1px solid rgba(241, 196, 15, 0.3);
+    padding: 8px 20px;
+    border-radius: 30px;
+    color: #f1c40f;
+    font-weight: 600;
+    font-size: 14px;
+    display: inline-block;
+}
+
+/* WIEK W DUŻYM SLOCIE (POWIĘKSZONY) */
+.slot-large .age-widget {
+    padding: 40px;
+    justify-content: center;
+}
+
+.slot-large .age-widget h2 {
+    font-size: 34px;
+    margin-bottom: 8px;
+}
+
+.slot-large .age-widget .widget-subtitle {
+    display: block;
+    font-size: 16px;
+    color: #bbb;
+    margin-bottom: 35px;
+}
+
+.slot-large .age-widget .age-grid {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 16px;
+    max-width: 950px;
+    margin: 0 auto;
+}
+
+.slot-large .age-widget .time-box {
+    padding: 24px 12px;
+    border-radius: 20px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.slot-large .age-widget .time-box span:first-child {
+    font-size: 44px;
+    text-shadow: 0 0 25px rgba(241, 196, 15, 0.4);
+}
+
+.slot-large .age-widget .time-box .label {
+    font-size: 12px;
+    letter-spacing: 2px;
+    margin-top: 6px;
+}
+
+.slot-large .age-widget .age-footer {
+    display: block;
+}
+
+/* ========================================================
+   3. PANEL: MYŚL DNIA
+   ======================================================== */
+.quote-widget {
+    position: relative;
+    padding: 20px 22px;
+}
+
+.quote-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.quote-header h3 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #f1c40f;
+    font-weight: 600;
+}
+
+.quote-refresh-btn {
+    display: none;
+    background: rgba(241, 196, 15, 0.15);
+    border: 1px solid rgba(241, 196, 15, 0.35);
+    color: #f1c40f;
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-size: 12px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.quote-refresh-btn:hover {
+    background: #f1c40f;
+    color: #000;
+    transform: scale(1.05);
+}
+
+.quote-body {
+    position: relative;
+    padding: 0 10px;
+}
+
+.quote-mark {
+    display: none;
+    font-size: 60px;
+    font-family: Georgia, serif;
+    color: rgba(241, 196, 15, 0.25);
+    position: absolute;
+    line-height: 0;
+}
+.quote-open { top: 10px; left: -10px; }
+.quote-close { bottom: 0; right: -10px; }
+
+.quote-widget p {
+    font-size: 15px;
+    font-style: italic;
+    color: #e0e0e0;
+    line-height: 1.5;
+}
+
+.quote-author {
+    display: none;
+    margin-top: 20px;
+    font-size: 15px;
+    color: #f1c40f;
+    font-weight: 600;
+}
+
+/* CYTAT W DUŻYM SLOCIE (POWIĘKSZONY) */
+.slot-large .quote-widget {
+    padding: 50px 60px;
+}
+
+.slot-large .quote-widget .quote-header {
+    margin-bottom: 30px;
+    gap: 18px;
+}
+
+.slot-large .quote-widget .quote-header h3 {
+    font-size: 16px;
+    letter-spacing: 3px;
+}
+
+.slot-large .quote-widget .quote-refresh-btn {
+    display: inline-flex;
+    font-size: 13px;
+    padding: 8px 18px;
+}
+
+.slot-large .quote-widget .quote-mark {
+    display: block;
+}
+
+.slot-large .quote-widget .quote-body {
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 20px 40px;
+}
+
+.slot-large .quote-widget p {
+    font-size: 28px;
+    line-height: 1.6;
+    color: #ffffff;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.slot-large .quote-widget .quote-author {
+    display: block;
+}
+
+/* ========================================================
+   4. PANEL: DAJ PRZYSMAK
+   ======================================================== */
+.treat-widget {
+    position: relative;
+    overflow: visible;
+}
+
+.treat-inner {
+    position: relative;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.treat-btn {
+    background: linear-gradient(135deg, #f1c40f, #f39c12);
+    color: #111;
+    border: none;
+    padding: 14px 24px;
+    font-size: 18px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 8px 25px rgba(241, 196, 15, 0.4);
+    user-select: none;
+    width: 100%;
+    max-width: 320px;
+}
+
+.treat-btn:hover {
+    transform: scale(1.03) translateY(-2px);
+    box-shadow: 0 12px 30px rgba(241, 196, 15, 0.6);
+}
+
+.treat-btn:active {
+    transform: scale(0.96);
+}
+
+.treat-counter {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #aaa;
+}
+
+.treat-counter #treatCount {
+    color: #f1c40f;
+    font-weight: 800;
+    font-size: 22px;
+    margin: 0 4px;
+}
+
+.treat-bonus-bar {
+    display: none;
+    margin-top: 25px;
+    gap: 12px;
+}
+
+.treat-tag {
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: 0.2s;
+    user-select: none;
+}
+
+.treat-tag:hover {
+    transform: translateY(-3px) scale(1.06);
+    background: rgba(241, 196, 15, 0.2);
+    border-color: #f1c40f;
+    color: #f1c40f;
+}
+
+/* PRZYSMAK W DUŻYM SLOCIE (POWIĘKSZONY) */
+.slot-large .treat-widget {
+    padding: 50px;
+}
+
+.slot-large .treat-widget .treat-btn {
+    padding: 22px 45px;
+    font-size: 26px;
+    max-width: 440px;
+}
+
+.slot-large .treat-widget .treat-counter {
+    margin-top: 24px;
+    font-size: 18px;
+}
+
+.slot-large .treat-widget .treat-counter #treatCount {
+    font-size: 36px;
+}
+
+.slot-large .treat-widget .treat-bonus-bar {
+    display: flex;
+}
+
+/* ANIMACJA LATAJĄCYCH PRZYSMAKÓW */
+.floating-treat {
+    position: absolute;
+    font-size: 36px;
+    pointer-events: none;
+    animation: floatUp 1.2s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+    z-index: 100;
+}
+
+@keyframes floatUp {
+    0% {
+        opacity: 1;
+        transform: translate(0, 0) scale(0.8) rotate(0deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(var(--offset-x), -180px) scale(1.5) rotate(var(--rotation));
+    }
+}
+
+/* PRZYCISK RESETOWANIA UKŁADU */
+.reset-layout-btn {
+    position: fixed;
+    bottom: 18px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(20, 20, 26, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #888;
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 9999;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.reset-layout-btn:hover {
+    color: #f1c40f;
+    border-color: rgba(241, 196, 15, 0.4);
+    background: rgba(30, 30, 40, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(241, 196, 15, 0.2);
+}
+
+.reset-layout-btn svg {
+    transition: transform 0.4s ease;
+}
+
+.reset-layout-btn:hover svg {
+    transform: rotate(-180deg);
+}
+
+/* RESPONSYWNOŚĆ NA MNIEJSZYCH EKRANACH */
+@media (max-width: 950px) {
+    body {
+        height: auto;
+        overflow-y: auto;
+        display: block;
+        padding: 15px;
+    }
+    .app-layout {
+        grid-template-columns: 1fr;
+        height: auto;
+        max-height: none;
+        gap: 16px;
+    }
+    .panel-slot.slot-large {
+        height: 480px;
+    }
+    .sidebar-slots {
+        height: auto;
+        gap: 16px;
+    }
+    .panel-slot.slot-small {
+        height: 260px;
+        flex: none;
+    }
+    .reset-layout-btn {
+        bottom: 10px;
+        right: 10px;
+    }
+}
