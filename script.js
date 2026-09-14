@@ -652,17 +652,61 @@ function getRandomQuote(event) {
 
 
 // ========================================================
-// 5. SKRYPT DAJ PRZYSMAK
+// 5. GLOBALNY LICZNIK PRZYSMAKÓW (CounterAPI)
 // ========================================================
+const COUNTER_API_BASE = 'https://api.counterapi.dev/v2/queeeks-team-5525/przysmakibena';
+
+// Wczytaj ostatnią zapisaną lokalnie wartość jako stan początkowy, dopóki API nie odpowie
 let treatCount = parseInt(localStorage.getItem('benTreatsCount')) || 0;
 const treatCountEl = document.getElementById('treatCount');
-if (treatCountEl) treatCountEl.innerText = treatCount;
+updateTreatCountDisplay(treatCount);
+
+// Pobierz aktualny globalny licznik z CounterAPI
+fetchGlobalTreatCount();
+
+// Odświeżaj licznik co 10 sekund oraz po powrocie użytkownika do karty przeglądarki
+setInterval(fetchGlobalTreatCount, 10000);
+window.addEventListener('focus', fetchGlobalTreatCount);
+
+async function fetchGlobalTreatCount() {
+    try {
+        const response = await fetch(`${COUNTER_API_BASE}?t=${Date.now()}`);
+        if (!response.ok) return;
+        const result = await response.json();
+        if (result && result.data && typeof result.data.up_count === 'number') {
+            const serverCount = result.data.up_count;
+            if (serverCount >= treatCount) {
+                treatCount = serverCount;
+                updateTreatCountDisplay(treatCount);
+                localStorage.setItem('benTreatsCount', treatCount);
+            }
+        }
+    } catch (err) {
+        console.warn('Błąd podczas pobierania globalnego licznika z CounterAPI:', err);
+    }
+}
+
+function updateTreatCountDisplay(count) {
+    if (treatCountEl) {
+        treatCountEl.innerText = count.toLocaleString('pl-PL');
+    }
+}
+
+async function incrementGlobalTreat() {
+    try {
+        await fetch(`${COUNTER_API_BASE}/up?t=${Date.now()}_${Math.random()}`);
+    } catch (err) {
+        console.warn('Błąd podczas wysyłania przysmaku do CounterAPI:', err);
+    }
+}
 
 function giveTreat(event) {
     if (event) event.stopPropagation();
     treatCount++;
-    if (treatCountEl) treatCountEl.innerText = treatCount;
+    updateTreatCountDisplay(treatCount);
     localStorage.setItem('benTreatsCount', treatCount);
+
+    incrementGlobalTreat();
 
     const treats = ['🦴', '🥩', '🥓', '🍗'];
     spawnFloatingTreats(event, treats, 6);
@@ -671,8 +715,10 @@ function giveTreat(event) {
 function giveSpecialTreat(event, emoji) {
     if (event) event.stopPropagation();
     treatCount++;
-    if (treatCountEl) treatCountEl.innerText = treatCount;
+    updateTreatCountDisplay(treatCount);
     localStorage.setItem('benTreatsCount', treatCount);
+
+    incrementGlobalTreat();
 
     spawnFloatingTreats(event, [emoji], 7);
 }
