@@ -656,16 +656,23 @@ function getRandomQuote(event) {
 // ========================================================
 const COUNTER_API_BASE = 'https://api.counterapi.dev/v2/queeeks-team-5525/przysmakibena';
 
-// Wczytaj ostatnią zapisaną lokalnie wartość jako stan początkowy, dopóki API nie odpowie
-let treatCount = parseInt(localStorage.getItem('benTreatsCount')) || 0;
-const treatCountEl = document.getElementById('treatCount');
-updateTreatCountDisplay(treatCount);
+// Wyczyść stary lokalny licznik, który blokował synchronizację z serwerem
+localStorage.removeItem('benTreatsCount');
 
-// Pobierz aktualny globalny licznik z CounterAPI
+let serverTreatCount = 0;
+let pendingLocalIncrements = 0;
+let isInitialLoaded = false;
+
+const treatCountEl = document.getElementById('treatCount');
+if (treatCountEl) {
+    treatCountEl.innerText = '...';
+}
+
+// Pobierz aktualny globalny licznik z CounterAPI natychmiast
 fetchGlobalTreatCount();
 
-// Odświeżaj licznik co 10 sekund oraz po powrocie użytkownika do karty przeglądarki
-setInterval(fetchGlobalTreatCount, 10000);
+// Odświeżaj licznik co 6 sekund oraz za każdym razem, gdy użytkownik wraca do karty
+setInterval(fetchGlobalTreatCount, 6000);
 window.addEventListener('focus', fetchGlobalTreatCount);
 
 async function fetchGlobalTreatCount() {
@@ -674,38 +681,46 @@ async function fetchGlobalTreatCount() {
         if (!response.ok) return;
         const result = await response.json();
         if (result && result.data && typeof result.data.up_count === 'number') {
-            const serverCount = result.data.up_count;
-            if (serverCount >= treatCount) {
-                treatCount = serverCount;
-                updateTreatCountDisplay(treatCount);
-                localStorage.setItem('benTreatsCount', treatCount);
-            }
+            serverTreatCount = result.data.up_count;
+            isInitialLoaded = true;
+            renderTreatCount();
         }
     } catch (err) {
         console.warn('Błąd podczas pobierania globalnego licznika z CounterAPI:', err);
     }
 }
 
-function updateTreatCountDisplay(count) {
-    if (treatCountEl) {
-        treatCountEl.innerText = count.toLocaleString('pl-PL');
-    }
+function renderTreatCount() {
+    if (!treatCountEl) return;
+    const total = isInitialLoaded ? (serverTreatCount + pendingLocalIncrements) : 0;
+    treatCountEl.innerText = total.toLocaleString('pl-PL');
 }
 
 async function incrementGlobalTreat() {
+    pendingLocalIncrements++;
+    renderTreatCount();
+
     try {
-        await fetch(`${COUNTER_API_BASE}/up?t=${Date.now()}_${Math.random()}`);
+        const response = await fetch(`${COUNTER_API_BASE}/up?t=${Date.now()}_${Math.random()}`);
+        if (response.ok) {
+            pendingLocalIncrements = Math.max(0, pendingLocalIncrements - 1);
+            serverTreatCount++;
+            renderTreatCount();
+        } else {
+            setTimeout(() => {
+                pendingLocalIncrements = Math.max(0, pendingLocalIncrements - 1);
+                renderTreatCount();
+            }, 1000);
+        }
     } catch (err) {
         console.warn('Błąd podczas wysyłania przysmaku do CounterAPI:', err);
+        pendingLocalIncrements = Math.max(0, pendingLocalIncrements - 1);
+        renderTreatCount();
     }
 }
 
 function giveTreat(event) {
     if (event) event.stopPropagation();
-    treatCount++;
-    updateTreatCountDisplay(treatCount);
-    localStorage.setItem('benTreatsCount', treatCount);
-
     incrementGlobalTreat();
 
     const treats = ['🦴', '🥩', '🥓', '🍗'];
@@ -714,10 +729,6 @@ function giveTreat(event) {
 
 function giveSpecialTreat(event, emoji) {
     if (event) event.stopPropagation();
-    treatCount++;
-    updateTreatCountDisplay(treatCount);
-    localStorage.setItem('benTreatsCount', treatCount);
-
     incrementGlobalTreat();
 
     spawnFloatingTreats(event, [emoji], 7);
